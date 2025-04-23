@@ -4,75 +4,43 @@
  */
 
 import { McpServerManager } from '../modules/mcp-server/index.js';
-import { Logger } from '../utils/logger.js';
+import { toolRegistrar, ToolRegistrar } from './tool-registrar.js';
 
-// Newsletter Detection Tools
-import { DetectNewsletterTool } from './detect-newsletter-tool.js';
-import { RecordNewsletterFeedbackTool } from './record-newsletter-feedback-tool.js';
-import { GetNewslettersForVerificationTool } from './get-newsletters-for-verification-tool.js';
+// Export all tools by category
+export * from './detect-newsletter-tool.js';
+export * from './record-newsletter-feedback-tool.js';
+export * from './get-newsletters-for-verification-tool.js';
+export * from './verify-newsletters-tool.js';
+export * from './update-newsletter-feedback-tool.js';
 
-// Content Processing Tools
-import { ExtractNewsletterContentTool } from './extract-newsletter-content-tool.js';
-import { GetNewsletterTopicsTool } from './get-newsletter-topics-tool.js';
-import { GetNewsletterLinksTool } from './get-newsletter-links-tool.js';
+export * from './extract-newsletter-content-tool.js';
+export * from './get-newsletter-topics-tool.js';
+export * from './get-newsletter-links-tool.js';
+export * from './get-newsletters-tool.js';
+export * from './search-newsletters-tool.js';
+export * from './get-newsletter-sources-tool.js';
 
-// Categorization Tools
-import { CategorizeNewsletterTool } from './categorize-newsletter-tool.js';
-import { GetCategoriesTool } from './get-categories-tool.js';
-import { ManageCategoryTool } from './manage-category-tool.js';
-import { AssignCategoryTool } from './assign-category-tool.js';
+export * from './categorize-newsletter-tool.js';
+export * from './get-categories-tool.js';
+export * from './manage-category-tool.js';
+export * from './assign-category-tool.js';
 
-const logger = new Logger('ToolsRegistration');
+export * from './generate-digest-tool.js';
+export * from './configure-digest-delivery-tool.js';
+export * from './send-digest-email-tool.js';
+
+// Export the tool registrar
+export { toolRegistrar, ToolRegistrar };
 
 /**
  * Register all Hypat.ai tools with the MCP server
  * @param serverManager The MCP server manager instance
  */
 export function registerHypatTools(serverManager: McpServerManager): void {
-  logger.info('Registering Hypat.ai tools with MCP server');
-  
-  // Get the tool registry
-  const toolRegistry = serverManager.getToolRegistry();
-  
-  // Register newsletter detection tools
-  logger.debug('Registering newsletter detection tools');
-  toolRegistry.registerTool(DetectNewsletterTool);
-  toolRegistry.registerTool(RecordNewsletterFeedbackTool);
-  toolRegistry.registerTool(GetNewslettersForVerificationTool);
-  
-  // Register content processing tools
-  logger.debug('Registering content processing tools');
-  toolRegistry.registerTool(ExtractNewsletterContentTool);
-  toolRegistry.registerTool(GetNewsletterTopicsTool);
-  toolRegistry.registerTool(GetNewsletterLinksTool);
-  
-  // Register categorization tools
-  logger.debug('Registering categorization tools');
-  toolRegistry.registerTool(CategorizeNewsletterTool);
-  toolRegistry.registerTool(GetCategoriesTool);
-  toolRegistry.registerTool(ManageCategoryTool);
-  toolRegistry.registerTool(AssignCategoryTool);
-  
-  logger.info('All Hypat.ai tools registered successfully');
+  toolRegistrar.registerAllTools(serverManager);
 }
 
 /**
  * List of all available tools
  */
-export const HYPAT_TOOLS = [
-  // Newsletter Detection Tools
-  DetectNewsletterTool,
-  RecordNewsletterFeedbackTool,
-  GetNewslettersForVerificationTool,
-  
-  // Content Processing Tools
-  ExtractNewsletterContentTool,
-  GetNewsletterTopicsTool,
-  GetNewsletterLinksTool,
-  
-  // Categorization Tools
-  CategorizeNewsletterTool,
-  GetCategoriesTool,
-  ManageCategoryTool,
-  AssignCategoryTool
-];
+export const HYPAT_TOOLS = toolRegistrar.getAllTools();

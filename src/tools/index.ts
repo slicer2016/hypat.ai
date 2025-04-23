@@ -16,6 +16,12 @@ import { ExtractNewsletterContentTool } from './extract-newsletter-content-tool.
 import { GetNewsletterTopicsTool } from './get-newsletter-topics-tool.js';
 import { GetNewsletterLinksTool } from './get-newsletter-links-tool.js';
 
+// Categorization Tools
+import { CategorizeNewsletterTool } from './categorize-newsletter-tool.js';
+import { GetCategoriesTool } from './get-categories-tool.js';
+import { ManageCategoryTool } from './manage-category-tool.js';
+import { AssignCategoryTool } from './assign-category-tool.js';
+
 const logger = new Logger('ToolsRegistration');
 
 /**
@@ -40,6 +46,13 @@ export function registerHypatTools(serverManager: McpServerManager): void {
   toolRegistry.registerTool(GetNewsletterTopicsTool);
   toolRegistry.registerTool(GetNewsletterLinksTool);
   
+  // Register categorization tools
+  logger.debug('Registering categorization tools');
+  toolRegistry.registerTool(CategorizeNewsletterTool);
+  toolRegistry.registerTool(GetCategoriesTool);
+  toolRegistry.registerTool(ManageCategoryTool);
+  toolRegistry.registerTool(AssignCategoryTool);
+  
   logger.info('All Hypat.ai tools registered successfully');
 }
 
@@ -55,5 +68,11 @@ export const HYPAT_TOOLS = [
   // Content Processing Tools
   ExtractNewsletterContentTool,
   GetNewsletterTopicsTool,
-  GetNewsletterLinksTool
+  GetNewsletterLinksTool,
+  
+  // Categorization Tools
+  CategorizeNewsletterTool,
+  GetCategoriesTool,
+  ManageCategoryTool,
+  AssignCategoryTool
 ];

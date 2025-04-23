@@ -1,0 +1,33 @@
+{
+  "name": "hypat.ai",
+  "version": "1.0.0",
+  "description": "Hypat.ai is a specialized Model Context Protocol (MCP) server that transforms newsletter emails into an organized knowledge system. It's built on top of the GongRzhe/Gmail-MCP-Server and designed for knowledge workers who subscribe to multiple newsletters.",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "NODE_OPTIONS='--loader ts-node/esm' ts-node src/index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .ts src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "newsletter",
+    "gmail",
+    "mcp",
+    "email",
+    "knowledge-base"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@gongrzhe/server-gmail-autoauth-mcp": "github:GongRzhe/Gmail-MCP-Server",
+    "@modelcontextprotocol/sdk": "^1.10.2"
+  }
+}

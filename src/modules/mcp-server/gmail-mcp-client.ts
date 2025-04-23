@@ -29,7 +29,7 @@ class GmailMcpClient implements IGmailMcpClient {
       this.isConnected = true;
       this.logger.info('Connected to Gmail MCP Server successfully');
     } catch (error) {
-      this.logger.error('Failed to connect to Gmail MCP Server', error);
+      this.logger.error('Failed to connect to Gmail MCP Server', error instanceof Error ? error : undefined);
       throw new Error(`Failed to connect to Gmail MCP Server: ${error instanceof Error ? error.message : String(error)}`);
     }
   }

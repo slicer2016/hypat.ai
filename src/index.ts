@@ -1,52 +1,35 @@
 /**
  * Hypat.ai - Main Entry Point
- * A specialized MCP server for transforming newsletter emails into an organized knowledge system
+ * A specialized Model Context Protocol (MCP) server that transforms newsletter emails 
+ * into an organized knowledge system.
  */
 
-import { McpServerManager } from './modules/mcp-server/index.js';
-import { registerHypatTools } from './tools/index.js';
-import { Logger } from './utils/logger.js';
+// Export all modules
+export * from './core/digest/index.js';
 
-const logger = new Logger('Main');
+// Start the MCP server
+import { createDigestService } from './core/digest/index.js';
 
-async function main() {
-  try {
-    logger.info('Starting Hypat.ai MCP server...');
-    
-    // Initialize MCP Server Manager
-    const mcpServerManager = new McpServerManager();
-    
-    // Initialize the server
-    await mcpServerManager.initialize({
-      name: 'hypat.ai',
-      version: '1.0.0'
-    });
-    
-    // Register Hypat.ai tools
-    registerHypatTools(mcpServerManager);
-    
-    // Start the server
-    await mcpServerManager.start();
-    
-    logger.info('Hypat.ai MCP server started successfully');
-    
-    // Handle graceful shutdown
-    process.on('SIGINT', async () => {
-      logger.info('Received SIGINT signal, shutting down...');
-      await mcpServerManager.stop();
-      process.exit(0);
-    });
-    
-    process.on('SIGTERM', async () => {
-      logger.info('Received SIGTERM signal, shutting down...');
-      await mcpServerManager.stop();
-      process.exit(0);
-    });
-  } catch (error) {
-    logger.error(`Failed to start Hypat.ai MCP server: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
+// This is a placeholder for the actual server startup
+// In a real implementation, this would initialize the MCP server
+console.log('Starting Hypat.ai MCP server...');
+
+// When proper implementations are available, the digest service can be initialized like this:
+/*
+const digestService = createDigestService(
+  contentProcessor,
+  categorizer,
+  {
+    host: 'smtp.example.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'user@example.com',
+      pass: 'password'
+    }
   }
-}
+);
 
-// Start the server
-main();
+// Start scheduling digests
+digestService.scheduleDigests();
+*/

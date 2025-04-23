@@ -1,58 +1,113 @@
 /**
- * Simple logger utility for consistent logging across the application
+ * Logger Utility
+ * Simple logger for the application
  */
 
-enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
+/**
+ * Logger levels
+ */
+export enum LogLevel {
+  ERROR = 'ERROR',
+  WARN = 'WARN',
+  INFO = 'INFO',
+  DEBUG = 'DEBUG'
 }
 
-class Logger {
-  private context: string;
-  private logLevel: LogLevel;
+/**
+ * Logger implementation
+ */
+export class Logger {
+  private module: string;
+  private level: LogLevel = LogLevel.INFO; // Default level
 
-  constructor(context: string) {
-    this.context = context;
-    // Set default log level based on environment
-    this.logLevel = process.env.NODE_ENV === 'production' 
-      ? LogLevel.INFO 
-      : LogLevel.DEBUG;
+  constructor(module: string) {
+    this.module = module;
   }
 
-  setLogLevel(level: LogLevel): void {
-    this.logLevel = level;
+  /**
+   * Set the log level
+   * @param level The log level
+   */
+  setLevel(level: LogLevel): void {
+    this.level = level;
   }
 
-  private formatMessage(level: string, message: string): string {
+  /**
+   * Log an error message
+   * @param message The message to log
+   * @param error Optional error object
+   */
+  error(message: string, error?: Error): void {
+    this.log(LogLevel.ERROR, message, error);
+  }
+
+  /**
+   * Log a warning message
+   * @param message The message to log
+   */
+  warn(message: string): void {
+    this.log(LogLevel.WARN, message);
+  }
+
+  /**
+   * Log an info message
+   * @param message The message to log
+   */
+  info(message: string): void {
+    this.log(LogLevel.INFO, message);
+  }
+
+  /**
+   * Log a debug message
+   * @param message The message to log
+   */
+  debug(message: string): void {
+    this.log(LogLevel.DEBUG, message);
+  }
+
+  /**
+   * Log a message with a specific level
+   * @param level The log level
+   * @param message The message to log
+   * @param error Optional error object
+   */
+  private log(level: LogLevel, message: string, error?: Error): void {
+    // Check if we should log this level
+    if (!this.shouldLog(level)) {
+      return;
+    }
+
     const timestamp = new Date().toISOString();
-    return `${timestamp} [${level}] [${this.context}] ${message}`;
-  }
+    const formattedMessage = `[${timestamp}] [${level}] [${this.module}] ${message}`;
 
-  debug(message: string, ...args: any[]): void {
-    if (this.logLevel <= LogLevel.DEBUG) {
-      console.debug(this.formatMessage('DEBUG', message), ...args);
+    switch (level) {
+      case LogLevel.ERROR:
+        console.error(formattedMessage);
+        if (error) {
+          console.error(error);
+        }
+        break;
+      case LogLevel.WARN:
+        console.warn(formattedMessage);
+        break;
+      case LogLevel.INFO:
+        console.info(formattedMessage);
+        break;
+      case LogLevel.DEBUG:
+        console.debug(formattedMessage);
+        break;
     }
   }
 
-  info(message: string, ...args: any[]): void {
-    if (this.logLevel <= LogLevel.INFO) {
-      console.info(this.formatMessage('INFO', message), ...args);
-    }
-  }
+  /**
+   * Check if we should log a message with the given level
+   * @param level The log level to check
+   */
+  private shouldLog(level: LogLevel): boolean {
+    const levels = [LogLevel.ERROR, LogLevel.WARN, LogLevel.INFO, LogLevel.DEBUG];
+    const currentLevelIndex = levels.indexOf(this.level);
+    const levelIndex = levels.indexOf(level);
 
-  warn(message: string, ...args: any[]): void {
-    if (this.logLevel <= LogLevel.WARN) {
-      console.warn(this.formatMessage('WARN', message), ...args);
-    }
-  }
-
-  error(message: string, ...args: any[]): void {
-    if (this.logLevel <= LogLevel.ERROR) {
-      console.error(this.formatMessage('ERROR', message), ...args);
-    }
+    return levelIndex <= currentLevelIndex;
   }
 }
-
-export { Logger, LogLevel };

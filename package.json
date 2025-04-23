@@ -22,8 +22,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cron": "^2.0.1",
     "@types/jest": "^29.5.10",
+    "@types/luxon": "^3.6.2",
+    "@types/mjml": "^4.7.4",
+    "@types/mjml-react": "^2.0.10",
     "@types/node": "^22.14.1",
+    "@types/nodemailer": "^6.4.17",
     "@types/uuid": "^10.0.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
@@ -32,7 +37,12 @@
   },
   "dependencies": {
     "@gongrzhe/server-gmail-autoauth-mcp": "github:GongRzhe/Gmail-MCP-Server",
-    "@modelcontextprotocol/sdk": "^1.10.2"
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "cron": "^4.3.0",
+    "luxon": "^3.6.1",
+    "mjml": "^4.15.3",
+    "mjml-react": "^2.0.8",
+    "nodemailer": "^6.10.1"
   },
   "jest": {
     "transform": {},

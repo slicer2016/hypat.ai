@@ -1,0 +1,74 @@
+<mjml>
+  <mj-head>
+    <mj-title>Verify Your Email for Hypat.ai</mj-title>
+    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+    <mj-attributes>
+      <mj-all font-family="Roboto, Arial, sans-serif" />
+      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="24px" />
+      <mj-section padding="0px" />
+    </mj-attributes>
+    <mj-style>
+      a { text-decoration: none; color: #1976d2; }
+      .shadow { box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f9f9f9">
+    <!-- Header -->
+    <mj-section padding="20px 0" background-color="#1976d2">
+      <mj-column>
+        <mj-text font-size="28px" color="#ffffff" font-weight="bold" align="center">
+          Hypat.ai
+        </mj-text>
+        <mj-text font-size="18px" color="#ffffff" align="center">
+          Email Verification
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <!-- Content -->
+    <mj-section padding="20px 0" background-color="#ffffff">
+      <mj-column>
+        <mj-text>
+          <p>Hello {{name}},</p>
+          <p>Thank you for signing up for Hypat.ai newsletter digests. Please verify your email address to start receiving your personalized digests.</p>
+        </mj-text>
+        
+        <mj-button href="{{verificationUrl}}" background-color="#1976d2" color="white" font-weight="bold">
+          Verify Your Email
+        </mj-button>
+        
+        <mj-text>
+          <p>If you didn't sign up for Hypat.ai, you can safely ignore this email.</p>
+          <p>This verification link will expire in 24 hours.</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <!-- What to Expect -->
+    <mj-section padding="20px 0" background-color="#f5f5f5">
+      <mj-column>
+        <mj-text font-size="16px" font-weight="bold">
+          What to Expect from Hypat.ai
+        </mj-text>
+        
+        <mj-text>
+          <ul>
+            <li>Personalized newsletter digests delivered to your inbox</li>
+            <li>Content organized by themes and categories that matter to you</li>
+            <li>Highlights of important insights and trending topics</li>
+            <li>Control over frequency, format, and content preferences</li>
+          </ul>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <!-- Footer -->
+    <mj-section padding="20px 0" background-color="#f0f0f0">
+      <mj-column>
+        <mj-text font-size="12px" align="center">
+          &copy; 2025 Hypat.ai. All rights reserved.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

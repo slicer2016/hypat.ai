@@ -1,0 +1,53 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{title}}</mj-title>
+    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+    <mj-attributes>
+      <mj-all font-family="Roboto, Arial, sans-serif" />
+      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="24px" />
+      <mj-section padding="0px" />
+    </mj-attributes>
+    <mj-style>
+      a { text-decoration: none; color: #1976d2; }
+      .shadow { box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f9f9f9">
+    <!-- Header -->
+    <mj-section padding="20px 0" background-color="#1976d2">
+      <mj-column>
+        <mj-text font-size="28px" color="#ffffff" font-weight="bold" align="center">
+          Hypat.ai
+        </mj-text>
+        <mj-text font-size="18px" color="#ffffff" align="center">
+          {{title}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    
+    <!-- Intro -->
+    <mj-section padding="20px 0" background-color="#ffffff">
+      <mj-column>
+        <mj-text>
+          <p>Here's your weekly digest of newsletter content from {{startDate}} to {{endDate}}.</p>
+          <p>{{description}}</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Sections -->
+    {{sections}}
+    
+    <!-- Footer -->
+    <mj-section padding="20px 0" background-color="#f0f0f0">
+      <mj-column>
+        <mj-text font-size="12px" align="center">
+          This digest was generated on {{generatedAt}} by Hypat.ai
+        </mj-text>
+        <mj-text font-size="12px" align="center">
+          <a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

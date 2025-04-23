@@ -4,6 +4,7 @@
  */
 
 import { McpServerManager } from './modules/mcp-server/index.js';
+import { registerHypatTools } from './tools/index.js';
 import { Logger } from './utils/logger.js';
 
 const logger = new Logger('Main');
@@ -20,6 +21,9 @@ async function main() {
       name: 'hypat.ai',
       version: '1.0.0'
     });
+    
+    // Register Hypat.ai tools
+    registerHypatTools(mcpServerManager);
     
     // Start the server
     await mcpServerManager.start();

@@ -54,3 +54,17 @@ export interface McpServerManager {
   getResourceRegistry(): ResourceRegistry;
   getPromptRegistry(): PromptRegistry;
 }
+
+/**
+ * Additional interfaces for MCP tool implementation
+ */
+export interface McpToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: any;
+  outputSchema: any;
+}
+
+export interface McpTool<InputType, OutputType> {
+  execute(params: InputType): Promise<OutputType>;
+}

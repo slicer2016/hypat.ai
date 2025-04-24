@@ -121,6 +121,12 @@ export interface FeedbackAnalytics {
     rejects: number;
   }>;
   topMisclassifiedDomains: string[];
+  patterns?: {               // Extracted patterns from feedback
+    confirmed: string[];     // Patterns found in confirmed newsletters
+    rejected: string[];      // Patterns found in rejected newsletters
+    uncertain?: string[];    // Patterns found in uncertain emails
+  };
+  recommendations?: string[]; // Improvement recommendations
   generatedAt: Date;
 }
 
@@ -255,6 +261,12 @@ export interface DetectionImprover {
    * @param feedback The feedback to apply
    */
   applyFeedback(feedback: FeedbackItem): Promise<void>;
+  
+  /**
+   * Apply improvements based on feedback analytics
+   * @param analysis Feedback analytics with patterns and recommendations
+   */
+  applyImprovements(analysis: FeedbackAnalytics): Promise<void>;
   
   /**
    * Update sender reputation based on feedback

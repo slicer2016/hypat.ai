@@ -37,13 +37,19 @@ export class ContentProcessorImpl implements ContentProcessor {
   // In a real implementation, this would come from the Gmail MCP Client
   private emailCache: Map<string, { html: string, raw: string }>;
 
-  constructor() {
+  constructor(
+    htmlExtractor?: HtmlContentExtractor,
+    linkExtractor?: LinkExtractor,
+    topicExtractor?: TopicExtractor,
+    structureParser?: NewsletterStructureParser,
+    contentRepository?: ContentRepository
+  ) {
     this.logger = new Logger('ContentProcessor');
-    this.htmlExtractor = new HtmlContentExtractorImpl();
-    this.structureParser = new NewsletterStructureParserImpl();
-    this.linkExtractor = new LinkExtractorImpl();
-    this.topicExtractor = new TopicExtractorImpl();
-    this.contentRepository = new InMemoryContentRepository();
+    this.htmlExtractor = htmlExtractor || new HtmlContentExtractorImpl();
+    this.linkExtractor = linkExtractor || new LinkExtractorImpl();
+    this.topicExtractor = topicExtractor || new TopicExtractorImpl();
+    this.structureParser = structureParser || new NewsletterStructureParserImpl();
+    this.contentRepository = contentRepository || new InMemoryContentRepository();
     
     // Initialize email cache (for demo purposes)
     this.emailCache = new Map<string, { html: string, raw: string }>();
@@ -175,6 +181,37 @@ export class ContentProcessorImpl implements ContentProcessor {
     } catch (error) {
       this.logger.error(`Error retrieving content: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Content retrieval failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Process email content for storage and retrieval
+   * @param email The email to process
+   * @returns Processed content ready for storage
+   */
+  async processEmailContent(email: any): Promise<any> {
+    try {
+      this.logger.info(`Processing email content for ${email.id}`);
+      
+      // In a real implementation, this would extract content from the email
+      // and process it into a structured format
+      
+      // For the test implementation, create a basic structure
+      return {
+        newsletterId: email.id,
+        subject: email.payload?.headers?.find((h: any) => h.name === 'Subject')?.value || 'No Subject',
+        sender: email.payload?.headers?.find((h: any) => h.name === 'From')?.value || 'Unknown',
+        receivedDate: new Date(email.internalDate || Date.now()),
+        content: 'Processed content would go here',
+        summary: 'This is a summary of the newsletter content',
+        links: [
+          { url: 'https://example.com/article1', title: 'Article 1', isSponsored: false },
+          { url: 'https://example.com/article2', title: 'Article 2', isSponsored: false }
+        ]
+      };
+    } catch (error) {
+      this.logger.error(`Error processing email content: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
   }
 

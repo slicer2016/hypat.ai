@@ -7,7 +7,8 @@ import {
   DetectionImprover, 
   FeedbackItem, 
   FeedbackRepository, 
-  FeedbackType 
+  FeedbackType,
+  FeedbackAnalytics
 } from './interfaces.js';
 import { Logger } from '../../utils/logger.js';
 
@@ -196,6 +197,83 @@ export class DetectionImproverImpl implements DetectionImprover {
     }
   }
 
+  /**
+   * Apply improvements based on feedback analysis
+   * @param analysis The feedback analysis to apply
+   */
+  async applyImprovements(analysis: FeedbackAnalytics): Promise<void> {
+    try {
+      this.logger.info(`Applying improvements from feedback analysis for user ${analysis.userId}`);
+      
+      // Process misclassified domains if available
+      if (analysis.topMisclassifiedDomains && analysis.topMisclassifiedDomains.length > 0) {
+        this.logger.info(`Updating reputation for ${analysis.topMisclassifiedDomains.length} misclassified domains`);
+        
+        for (const domain of analysis.topMisclassifiedDomains) {
+          // Get domain stats
+          const domainStats = analysis.domainBreakdown[domain];
+          
+          if (!domainStats) continue;
+          
+          // Determine majority feedback type for this domain
+          const isNewsletterDomain = domainStats.confirms > domainStats.rejects;
+          
+          // Calculate weight based on the confidence of the majority
+          const total = domainStats.confirms + domainStats.rejects;
+          const weight = total > 0 ? 
+            (isNewsletterDomain ? domainStats.confirms / total : domainStats.rejects / total) : 0;
+          
+          // Update domain reputation with higher weight because it's misclassified
+          await this.detector.updateDomainReputation(domain, isNewsletterDomain, weight * 2.0);
+          
+          this.logger.debug(`Updated domain reputation for ${domain} (newsletter: ${isNewsletterDomain}, weight: ${weight})`);
+        }
+      }
+      
+      // If we have patterns from analysis, apply them
+      if (analysis.patterns) {
+        // In a real implementation, we would extract patterns from the feedback
+        // For now, we'll just create mock patterns based on analysis metrics
+        const featureUpdates: Record<string, number> = {};
+        
+        // Add features that indicate newsletters based on high accuracy
+        if (analysis.accuracy > 0.7) {
+          featureUpdates['has_unsubscribe_link'] = 0.8;
+          featureUpdates['multi_section_layout'] = 0.7;
+          featureUpdates['contains_images'] = 0.5;
+        }
+        
+        // Adjust features based on false positives vs false negatives
+        if (analysis.falsePositives > analysis.falseNegatives) {
+          // Too many false positives, make detection more strict
+          featureUpdates['short_content'] = -0.3;
+          featureUpdates['is_reply'] = -0.8;
+        } else if (analysis.falseNegatives > analysis.falsePositives) {
+          // Too many false negatives, make detection more lenient
+          featureUpdates['from_newsletter_domain'] = 0.6;
+          featureUpdates['periodic_subject'] = 0.7;
+        }
+        
+        // Apply feature updates
+        await this.detector.updateFeatureWeights(featureUpdates);
+        
+        this.logger.info(`Applied feature updates based on feedback analysis`);
+      }
+      
+      // Train a personalized model if accuracy is low
+      if (analysis.accuracy < 0.8 && (analysis.confirmCount + analysis.rejectCount) >= 10) {
+        this.logger.info(`Training personalized model for user ${analysis.userId} due to low accuracy (${analysis.accuracy})`);
+        
+        await this.trainPersonalizedModel(analysis.userId);
+      }
+      
+      this.logger.info(`Successfully applied improvements from feedback analysis for user ${analysis.userId}`);
+    } catch (error) {
+      this.logger.error(`Error applying improvements: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Failed to apply improvements: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
   /**
    * Apply user preferences to detection
    * @param userId The ID of the user

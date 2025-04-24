@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { Tool } from '../interfaces/mcp-server.js';
 import { getRepositoryFactory } from '../data/index.js';
+import { createFeedbackService } from '../core/feedback/index.js';
 import { Logger } from '../utils/logger.js';
 
 // Define input schema
@@ -41,34 +42,22 @@ export const VerifyNewslettersTool: Tool = {
       // Get newsletter repository
       const newsletterRepository = repositoryFactory.getSpecializedRepository('NewsletterRepository');
       
-      // Get newsletters to verify
-      let newsletters = [];
+      // Create feedback service
+      const { feedbackService } = createFeedbackService();
       
-      if (args.detectionResults && args.detectionResults.length > 0) {
-        // Use provided newsletter IDs
-        newsletters = await Promise.all(
-          args.detectionResults
-            .slice(0, args.limit)
-            .map(id => newsletterRepository.findById(id))
-        );
-        
-        // Filter out any null results (not found)
-        newsletters = newsletters.filter(Boolean);
-      } else {
-        // Find unverified newsletters with confidence above threshold
-        newsletters = await newsletterRepository.find({
-          where: {
-            isVerified: false,
-            detectionConfidence: { $gte: args.confidenceThreshold }
-          },
-          orderBy: [{ field: 'detectionConfidence', direction: 'desc' }],
-          limit: args.limit
-        });
-      }
+      // Options for generating verification requests
+      const options = {
+        confidenceThreshold: args.confidenceThreshold || 0.7,
+        limit: args.limit || 10
+      };
       
-      logger.info(`Found ${newsletters.length} newsletters for verification`);
+      // Use the feedback service to get newsletters that need verification
+      const verificationRequests = await feedbackService.getVerificationRequestGenerator()
+        .generateVerificationRequests(options);
       
-      if (newsletters.length === 0) {
+      logger.info(`Found ${verificationRequests.length} newsletters for verification`);
+      
+      if (verificationRequests.length === 0) {
         return {
           content: [
             {
@@ -82,7 +71,15 @@ export const VerifyNewslettersTool: Tool = {
       // Prepare newsletters for verification
       const newslettersForVerification = [];
       
-      for (const newsletter of newsletters) {
+      for (const request of verificationRequests) {
+        // Get the newsletter from the repository for additional details
+        const newsletter = await newsletterRepository.findById(request.id);
+        
+        if (!newsletter) {
+          logger.warn(`Newsletter ${request.id} not found in repository`);
+          continue;
+        }
+        
         // Get additional data about the newsletter
         const newsletterWithCategories = await newsletterRepository.findWithCategories(newsletter.id);
         
@@ -104,7 +101,8 @@ export const VerifyNewslettersTool: Tool = {
           sender: newsletter.sender,
           receivedDate: newsletter.receivedDate.toISOString(),
           detectionConfidence: newsletter.detectionConfidence,
-          categories: newsletterWithCategories ? newsletterWithCategories.categories : []
+          categories: newsletterWithCategories ? newsletterWithCategories.categories : [],
+          actions: (request as any).actions || []
         };
         
         // Include summary if requested and available

@@ -11,7 +11,8 @@ import {
   FeedbackType, 
   VerificationRequestGenerator,
   UserFeedback,
-  FeedbackItem
+  FeedbackItem,
+  VerificationRequest
 } from './interfaces.js';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger } from '../../utils/logger.js';
@@ -43,12 +44,77 @@ export class FeedbackServiceImpl implements FeedbackService {
   }
 
   /**
-   * Submit feedback for an email
-   * @param userId The ID of the user
-   * @param emailId The ID of the email
-   * @param isNewsletter Whether the user considers this a newsletter
+   * Get the verification request generator
+   * Required for tests
    */
-  async submitFeedback(
+  getVerificationRequestGenerator(): VerificationRequestGenerator {
+    return this.verificationGenerator;
+  }
+
+  /**
+   * Get the feedback analyzer
+   * Required for tests
+   */
+  getFeedbackAnalyzer(): FeedbackAnalyzer {
+    return this.feedbackAnalyzer;
+  }
+
+  /**
+   * Get the detection improver
+   * Required for tests
+   */
+  getDetectionImprover(): DetectionImprover {
+    return this.detectionImprover;
+  }
+
+  /**
+   * Submit feedback for a newsletter
+   * @param feedback Feedback object with userId, newsletterId, feedbackType, and optional comment
+   */
+  async submitFeedback(feedback: {
+    userId: string,
+    newsletterId: string,
+    feedbackType: FeedbackType | 'confirm' | 'reject',
+    comment?: string
+  }): Promise<UserFeedback> {
+    try {
+      this.logger.info(`Submitting feedback for user ${feedback.userId}, newsletter ${feedback.newsletterId}: type=${feedback.feedbackType}`);
+      
+      // Handle string feedback types
+      const feedbackType = typeof feedback.feedbackType === 'string' 
+        ? (feedback.feedbackType === 'confirm' ? FeedbackType.CONFIRM : FeedbackType.REJECT)
+        : feedback.feedbackType;
+      
+      // Collect the feedback
+      const result = await this.feedbackCollector.collectFeedback(
+        feedback.userId,
+        feedback.newsletterId,
+        feedbackType,
+        feedback.comment
+      );
+      
+      // Convert the UserFeedback to a FeedbackItem before applying it to improve detection
+      const feedbackItem: FeedbackItem = {
+        ...result,
+        confidence: 0.5, // Default confidence
+        features: {},    // Default empty features
+      };
+      
+      await this.detectionImprover.applyFeedback(feedbackItem);
+      
+      this.logger.info(`Successfully submitted and processed feedback for user ${feedback.userId}, newsletter ${feedback.newsletterId}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Error submitting feedback: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Failed to submit feedback: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Legacy method for compatibility
+   * @deprecated
+   */
+  async submitFeedbackLegacy(
     userId: string, 
     emailId: string, 
     isNewsletter: boolean
@@ -143,6 +209,29 @@ export class FeedbackServiceImpl implements FeedbackService {
     } catch (error) {
       this.logger.error(`Error requesting verification: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to request verification: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Generate verification requests for newsletters with confidence below threshold
+   * @param options Options for request generation
+   */
+  async generateVerificationRequests(options: {
+    confidenceThreshold: number,
+    limit: number
+  }): Promise<VerificationRequest[]> {
+    try {
+      this.logger.info(
+        `Generating verification requests for newsletters with confidence below ${options.confidenceThreshold}`
+      );
+      
+      const requests = await this.verificationGenerator.generateVerificationRequests(options);
+      
+      this.logger.info(`Generated ${requests.length} verification requests`);
+      return requests;
+    } catch (error) {
+      this.logger.error(`Error generating verification requests: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Failed to generate verification requests: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

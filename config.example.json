@@ -1,0 +1,37 @@
+{
+  "environment": "development",
+  "database": {
+    "type": "sqlite",
+    "filename": "./data/database.sqlite",
+    "poolMin": 0,
+    "poolMax": 10,
+    "debug": false,
+    "migrate": true
+  },
+  "cache": {
+    "defaultTtl": 3600,
+    "maxSize": 1000
+  },
+  "email": {
+    "transport": "mock",
+    "from": "Hypat.ai Digests <digests@hypat.ai>",
+    "replyTo": "no-reply@hypat.ai"
+  },
+  "logging": {
+    "level": "info",
+    "file": {
+      "enabled": true,
+      "path": "./logs/hypat.log",
+      "rotationInterval": "daily"
+    },
+    "console": {
+      "enabled": true,
+      "colorize": true
+    }
+  },
+  "mcp": {
+    "useMockGmailClient": true,
+    "port": 8080,
+    "host": "localhost"
+  }
+}

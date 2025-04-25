@@ -1,6 +1,16 @@
 # Hypat.ai
 
+![Hypat.ai Logo](docs/images/hypat-logo.png)
+
 Hypat.ai is a specialized Model Context Protocol (MCP) server that transforms newsletter emails into an organized knowledge system. It's built on top of the GongRzhe/Gmail-MCP-Server and designed for knowledge workers who subscribe to multiple newsletters.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Node.js CI](https://github.com/slicer2016/hypat.ai/actions/workflows/test.yml/badge.svg)](https://github.com/slicer2016/hypat.ai/actions/workflows/test.yml)
+[![npm version](https://badge.fury.io/js/hypat.ai.svg)](https://www.npmjs.com/package/hypat.ai)
+
+## Overview
+
+Hypat.ai helps you manage newsletter overload by automatically identifying, categorizing, and digesting your newsletter subscriptions. It extracts valuable content and delivers personalized digests based on your preferences.
 
 The system consists of multiple modules:
 
@@ -18,6 +28,49 @@ The system consists of multiple modules:
 - **Digest Generation**: Generate daily, weekly, or custom digests of newsletter content
 - **User Feedback**: Improve detection and categorization through user feedback
 - **MCP Integration**: Seamlessly integrate with Gmail MCP Server
+- **Interactive Demo**: Try out the system with our comprehensive demo
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.x or higher
+- npm 9.x or higher
+- A Gmail account (for full functionality)
+
+### Installation
+
+```bash
+# Install globally
+npm install -g hypat.ai
+
+# Or install as a project dependency
+npm install hypat.ai
+```
+
+### Quick Start
+
+1. Install the package:
+   ```bash
+   npm install hypat.ai
+   ```
+
+2. Create a configuration file:
+   ```bash
+   cp node_modules/hypat.ai/config.example.json config.json
+   ```
+
+3. Edit the configuration file with your settings
+
+4. Run the demo to explore features:
+   ```bash
+   npx hypat demo
+   ```
+
+5. Start the server:
+   ```bash
+   npx hypat start
+   ```
 
 ## Email Digest Module
 

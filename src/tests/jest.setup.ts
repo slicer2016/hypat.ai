@@ -63,4 +63,7 @@ global.testDatabaseManager = null;
 global.testRepositoryFactory = null;
 global.testEnvironment = true;
 
-console.log('Jest setup complete - UUID and Date mocks configured');
+// Log when not in CI environment
+if (!process.env.CI) {
+  console.log('Jest setup complete - UUID and Date mocks configured');
+}

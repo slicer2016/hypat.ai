@@ -4,6 +4,18 @@
   "description": "Hypat.ai is a specialized Model Context Protocol (MCP) server that transforms newsletter emails into an organized knowledge system. It's built on top of the GongRzhe/Gmail-MCP-Server and designed for knowledge workers who subscribe to multiple newsletters.",
   "main": "dist/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slicer2016/hypat.ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/slicer2016/hypat.ai/issues"
+  },
+  "homepage": "https://github.com/slicer2016/hypat.ai#readme",
   "scripts": {
     "start": "node dist/index.js",
     "start:dev": "NODE_ENV=development node dist/index.js",
@@ -27,10 +39,18 @@
     "gmail",
     "mcp",
     "email",
-    "knowledge-base"
+    "knowledge-base",
+    "digest",
+    "categorization",
+    "content-processing",
+    "ai",
+    "newsletter-management",
+    "email-processing",
+    "claude",
+    "anthropic"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Vinay Sridhar <info@hypat.ai>",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/plugin-syntax-flow": "^7.26.0",

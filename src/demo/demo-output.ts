@@ -436,9 +436,9 @@ export class DemoOutput {
    * @param language The language of the code
    */
   printCodeBlock(code: string, language: string = ''): void {
-    console.log(`${Colors.FG.GRAY}```${language}`);
+    console.log(`${Colors.FG.GRAY}\`\`\`${language}`);
     console.log(code);
-    console.log(````${Colors.RESET}`);
+    console.log(`\`\`\`${Colors.RESET}`);
   }
   
   /**

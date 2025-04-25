@@ -3,17 +3,30 @@
  * Demonstrates key features of the Hypat.ai newsletter processing system
  */
 
+console.log("Starting demo script...");
+
 import { DemoOutput } from './demo/demo-output.js';
+console.log("Imported DemoOutput");
+
 import { DemoSetup } from './demo/demo-setup.js';
+console.log("Imported DemoSetup");
+
 import { Config } from './config/config.js';
+console.log("Imported Config");
+
 import { createNewsletterDetector } from './core/detection/index.js';
 import { createCategorizer } from './core/categorization/index.js';
 import { createContentProcessor } from './core/content-processing/index.js';
 import { createDigestService } from './core/digest/index.js';
 import { createFeedbackService } from './core/feedback/index.js';
 import { Logger } from './utils/logger.js';
+console.log("Imported core modules");
+
 import { v4 as uuidv4 } from 'uuid';
+console.log("Imported uuid");
+
 import path from 'path';
+console.log("All imports complete");
 
 /**
  * Main demo function

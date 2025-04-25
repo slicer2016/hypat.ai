@@ -463,4 +463,22 @@ export class DatabaseManagerImpl implements DatabaseManager {
   getDefaultConnectionName(): string {
     return this.defaultConnection;
   }
+  
+  /**
+   * Close the default database connection
+   */
+  async close(): Promise<void> {
+    try {
+      this.logger.info('Closing default database connection');
+      
+      const connection = this.getConnection();
+      await connection.close();
+      this.connections.delete(this.defaultConnection);
+      
+      this.logger.info('Default database connection closed successfully');
+    } catch (error) {
+      this.logger.error(`Error closing database connection: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
+    }
+  }
 }

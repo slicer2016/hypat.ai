@@ -188,6 +188,12 @@ export interface RepositoryFactory {
    * @param entityType The entity type
    */
   getRepository<T extends Entity>(entityType: new () => T): Repository<T>;
+  
+  /**
+   * Get a specialized repository by name
+   * @param repositoryName The repository name
+   */
+  getSpecializedRepository<R>(repositoryName: string): R;
 }
 
 /**
@@ -409,6 +415,11 @@ export interface DatabaseManager {
    * Close all database connections
    */
   closeAll(): Promise<void>;
+  
+  /**
+   * Close the default database connection
+   */
+  close(): Promise<void>;
 }
 
 /**

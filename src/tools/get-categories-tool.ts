@@ -55,7 +55,8 @@ export const GetCategoriesTool: Tool = {
       const categories = await categorizer.getCategories(params.userId);
       
       // Get user preferences
-      const manualHandler = (categorizer as any).manualHandler;
+      // Access the manual categorization handler from the categorizer
+      const manualHandler = (categorizer as { manualHandler?: { getUserCategoryPreferences: (userId: string) => Promise<Record<string, number>> } }).manualHandler;
       const preferences = manualHandler ? 
         await manualHandler.getUserCategoryPreferences(params.userId) : 
         undefined;
@@ -89,10 +90,21 @@ export const GetCategoriesTool: Tool = {
               json: response
             }
           ]
-        } as any;
+        };
       }
       
-      return response as any;
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Found ${categories.length} categories.`
+          },
+          {
+            type: 'json',
+            json: response
+          }
+        ]
+      };
     } catch (error) {
       logger.error(`Error getting categories: ${error instanceof Error ? error.message : String(error)}`);
       
@@ -105,7 +117,7 @@ export const GetCategoriesTool: Tool = {
               text: `Error getting categories: ${error instanceof Error ? error.message : String(error)}`
             }
           ]
-        } as any;
+        };
       }
       
       throw new Error(`Failed to get categories: ${error instanceof Error ? error.message : String(error)}`);

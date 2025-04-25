@@ -122,6 +122,17 @@ export interface ContentProcessor {
    * @param newsletterId The ID of the newsletter
    */
   getContent(newsletterId: string): Promise<ExtractedContent | null>;
+  
+  /**
+   * Get processed content by newsletter ID
+   * @param newsletterId The ID of the newsletter
+   */
+  getProcessedContent(newsletterId: string): Promise<Record<string, any>>;
+  
+  /**
+   * Get the content repository
+   */
+  getContentRepository(): ContentRepository;
 }
 
 /**
@@ -244,4 +255,17 @@ export interface ContentRepository {
    * @param newsletterId The ID of the newsletter
    */
   deleteContent(newsletterId: string): Promise<boolean>;
+  
+  /**
+   * Search content with given query
+   * @param query The search query
+   * @param newsletterIds Optional list of newsletter IDs to restrict search to
+   * @param limit Maximum number of results to return
+   * @returns Array of search results with newsletter ID, score, and matched content
+   */
+  searchContent(
+    query: string, 
+    newsletterIds?: string[], 
+    limit?: number
+  ): Promise<Array<{newsletterId: string; score: number; matchedContent: string}>>;
 }

@@ -49,7 +49,7 @@ export const SearchNewslettersTool: Tool = {
       const newsletterRepository = repositoryFactory.getSpecializedRepository('NewsletterRepository');
       
       // Build query filters
-      const filters: any = {};
+      const filters: Record<string, unknown> = {};
       
       if (args.dateRange) {
         const startDate = new Date(args.dateRange.startDate);
@@ -114,7 +114,7 @@ export const SearchNewslettersTool: Tool = {
         const newsletterWithCategories = await newsletterRepository.findWithCategories(result.newsletterId);
         
         // Format result
-        const formattedResult = {
+        const formattedResult: Record<string, unknown> = {
           id: newsletter.id,
           emailId: newsletter.emailId,
           subject: newsletter.subject,

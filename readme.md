@@ -10,6 +10,15 @@ The system consists of multiple modules:
 4. **Email Digest Module**: Generates and delivers email digests of newsletter content
 5. **User Feedback Module**: Collects and processes user feedback to improve detection
 
+## Features
+
+- **Automatic Newsletter Detection**: Identify newsletters in your email inbox
+- **Content Extraction**: Extract and process content from newsletters
+- **Smart Categorization**: Organize newsletters into categories and topics
+- **Digest Generation**: Generate daily, weekly, or custom digests of newsletter content
+- **User Feedback**: Improve detection and categorization through user feedback
+- **MCP Integration**: Seamlessly integrate with Gmail MCP Server
+
 ## Email Digest Module
 
 The Email Digest Module is responsible for generating and delivering email digests of newsletter content. It provides the following features:
@@ -135,35 +144,292 @@ The User Feedback Module includes a verification process for handling uncertain 
 4. The feedback is collected and used to improve detection
 5. Verification requests expire after a configurable period
 
-## Development
+## Installation and Setup
 
 ### Prerequisites
 
 - Node.js 18 or higher
 - npm 7 or higher
+- A Gmail account with the Gmail-MCP-Server setup
 
 ### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/hypat.ai.git
+cd hypat.ai
+```
+
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Building
+3. Copy the example environment file and configure it:
+
+```bash
+cp .env.example .env
+# Edit .env with your settings
+```
+
+4. Create configuration files for your environments:
+
+```bash
+cp config.example.json config.json
+cp config.development.json config.development.json
+# Edit config files with your settings
+```
+
+5. Build the application:
 
 ```bash
 npm run build
 ```
 
+6. Run database migrations:
+
+```bash
+npm run db:migrate
+```
+
+### Configuration
+
+Hypat.ai supports multiple configuration methods:
+
+1. **Environment Variables**: Set in `.env` file or directly in your shell
+2. **JSON Configuration Files**: Use `config.json` or environment-specific files like `config.development.json`
+3. **Command Line Arguments**: Provide configuration via CLI arguments
+
+#### Important Configuration Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `DATABASE_TYPE` | Database type (sqlite, mysql, postgresql) | sqlite |
+| `DATABASE_FILENAME` | SQLite database file path | data/database.sqlite |
+| `EMAIL_TRANSPORT` | Email transport (smtp, ses, mock) | smtp |
+| `EMAIL_SENDER_ADDRESS` | Email sender address | hypat@example.com |
+| `LOG_LEVEL` | Logging level (error, warn, info, debug) | info |
+| `MCP_MOCK_GMAIL` | Use mock Gmail client for development | false |
+
+See `.env.example` for a complete list of configuration options.
+
+## Usage
+
+### Running the Application
+
+Start the application in development mode:
+
+```bash
+npm run dev
+```
+
+Start the application with production settings:
+
+```bash
+npm run start:prod
+```
+
+Run database migrations:
+
+```bash
+npm run db:migrate
+```
+
+### Command Line Options
+
+```
+Usage: hypat.ai [options]
+
+Options:
+  -V, --version             output the version number
+  -c, --config <path>       Path to configuration file
+  -e, --env <environment>   Environment (development, test, production) (default: "development")
+  -v, --verbose             Enable verbose logging
+  --migrate                 Run database migrations and exit
+  -h, --help                display help for command
+```
+
 ### Testing
+
+Run all tests:
 
 ```bash
 npm test
 ```
 
-### Type Checking
+Run unit tests only:
 
 ```bash
+npm run test:unit
+```
+
+Run integration tests only:
+
+```bash
+npm run test:integration
+```
+
+Generate test coverage report:
+
+```bash
+npm run test:coverage
+```
+
+### Development
+
+During development, you can use the development mode with verbose logging:
+
+```bash
+npm run dev
+```
+
+Check code quality:
+
+```bash
+npm run lint
 npm run typecheck
+```
+
+## Demo Mode
+
+Hypat.ai includes a comprehensive demo mode that showcases its capabilities using mock data. This is a great way to understand how the system works and explore its features without setting up a full Gmail integration.
+
+### Running the Demo
+
+To run the demo:
+
+```bash
+npm run demo
+```
+
+This will initialize the system with sample data and guide you through key features including:
+
+1. Newsletter detection with confidence scoring
+2. Content extraction and processing
+3. Automatic categorization of newsletters
+4. Digest generation (daily and weekly)
+5. User feedback processing and detection improvements
+
+The demo uses a separate SQLite database file (`data/demo-database.sqlite`) so it won't interfere with your production data.
+
+### What the Demo Showcases
+
+![Demo Screenshot](docs/images/demo-screenshot.png)
+
+The demo provides a comprehensive walkthrough of Hypat.ai's capabilities:
+
+- **System Setup**: How the system is initialized and configured
+- **Newsletter Detection**: How emails are analyzed to determine if they're newsletters
+- **Content Processing**: How content is extracted and processed from newsletters
+- **Categorization**: How newsletters are automatically categorized and organized
+- **Digest Generation**: How daily and weekly digests are created from processed newsletters
+- **User Feedback**: How user feedback improves detection and categorization
+
+Each section includes detailed explanations and visual examples of the data and processes involved.
+
+### Demo Configuration
+
+The demo uses a separate configuration file (`config.demo.json`) with settings optimized for demonstration:
+
+- Uses a mock Gmail client instead of connecting to the real Gmail API
+- Uses a separate SQLite database for demo data
+- Pre-configures sample users and preferences
+- Uses colorized console output for better visualization
+
+You can customize the demo by editing `config.demo.json` to change settings like:
+
+- The number of sample newsletters to generate
+- The users to create
+- The categories to include
+- Whether to run the full workflow or just specific parts
+
+### Next Steps After the Demo
+
+After exploring the demo, you might want to:
+
+1. **Set up a real integration**: Configure the system to work with your Gmail account using the Gmail MCP Server
+2. **Customize the categories**: Define your own categories that match your newsletter interests
+3. **Configure your digest preferences**: Set up delivery preferences for your digest emails
+4. **Deploy to a server**: Set up Hypat.ai on a server for continuous operation
+
+See the [Installation and Setup](#installation-and-setup) section for details on how to get started with a real deployment.
+
+## Troubleshooting
+
+### Common Issues
+
+#### Database Connection Errors
+
+**Issue**: `Error: SQLITE_CANTOPEN: unable to open database file`
+
+**Solution**: 
+- Ensure the database directory exists and is writable
+- Check the database path in your configuration
+- For SQLite, try creating the database directory: `mkdir -p data`
+
+#### Template Rendering Issues
+
+**Issue**: `Error: Cannot find template: daily-standard`
+
+**Solution**:
+- Verify the templates directory path in your configuration
+- Check if the template file exists and is readable
+- For development, try using the simplified template renderer
+
+#### Gmail MCP Connection Errors
+
+**Issue**: `Error: Failed to connect to Gmail MCP Server`
+
+**Solution**:
+- Verify your Gmail MCP Server is running and accessible
+- Check network connectivity and firewall settings
+- In development, try using the mock Gmail client: `MCP_MOCK_GMAIL=true`
+
+#### Email Sending Issues
+
+**Issue**: `Error: Failed to send email`
+
+**Solution**:
+- Verify your SMTP settings (host, port, credentials)
+- Check if your SMTP server requires authentication
+- For testing, use the mock email transport: `EMAIL_TRANSPORT=mock`
+
+### Logging
+
+To enable more detailed logging:
+
+```bash
+LOG_LEVEL=debug npm run dev
+```
+
+Or use the verbose flag:
+
+```bash
+npm run dev -v
+```
+
+Logs are output to the console and to the log files in the `logs` directory (if file logging is enabled).
+
+### Helpful Commands
+
+Check database status:
+
+```bash
+sqlite3 data/database.sqlite ".tables"
+```
+
+Test email configuration:
+
+```bash
+npm run dev -- --config test-email
+```
+
+Clear cache:
+
+```bash
+rm -rf data/cache/*
 ```
 
 ## License

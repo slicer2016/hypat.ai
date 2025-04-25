@@ -16,7 +16,7 @@ export { UserPreferenceManagerImpl } from './user-preference-manager.js';
 export { DigestServiceImpl } from './digest-service.js';
 
 // Factory function to create and wire up all digest components
-import { DigestGenerator } from './interfaces.js';
+import { DigestGenerator, EmailDeliveryScheduler } from './interfaces.js';
 import { DigestGeneratorImpl } from './digest-generator.js';
 import { EmailTemplateRendererImpl } from './email-template-renderer.js';
 import { EmailDeliverySchedulerImpl } from './email-delivery-scheduler.js';
@@ -98,10 +98,10 @@ export function createDigestService(
   
   // Create digest service (need it for the scheduler)
   const digestService = new DigestServiceImpl(
-    digestGenerator as any,
+    digestGenerator as DigestGenerator,
     templateRenderer,
     emailSender,
-    null as any, // Will be set after creation
+    null as unknown as EmailDeliveryScheduler, // Will be set after creation
     userPreferenceManager
   );
   

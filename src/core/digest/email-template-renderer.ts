@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { 
   Digest, 
   DigestTemplate, 
-  EmailTemplateRenderer 
+  EmailTemplateRenderer,
+  DigestFrequency,
+  DigestFormat
 } from './interfaces.js';
 import { Logger } from '../../utils/logger.js';
 
@@ -44,8 +46,8 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
         id: 'daily-standard',
         name: 'Daily Standard',
         description: 'Standard daily digest template',
-        frequency: 'daily',
-        format: 'standard',
+        frequency: DigestFrequency.DAILY,
+        format: DigestFormat.STANDARD,
         template: this.createDailyStandardTemplate(),
         createdAt: new Date(),
         updatedAt: new Date()
@@ -56,8 +58,8 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
         id: 'weekly-standard',
         name: 'Weekly Standard',
         description: 'Standard weekly digest template',
-        frequency: 'weekly',
-        format: 'standard',
+        frequency: DigestFrequency.WEEKLY,
+        format: DigestFormat.STANDARD,
         template: this.createWeeklyStandardTemplate(),
         createdAt: new Date(),
         updatedAt: new Date()
@@ -68,8 +70,8 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
         id: 'verification',
         name: 'Verification',
         description: 'Newsletter verification email template',
-        frequency: 'once',
-        format: 'standard',
+        frequency: 'once' as any, // Special case for verification emails
+        format: DigestFormat.STANDARD,
         template: this.createVerificationTemplate(),
         createdAt: new Date(),
         updatedAt: new Date()
@@ -206,7 +208,7 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    * Get a template by ID
    * @param templateId The ID of the template to get
    */
-  getTemplate(templateId: string): DigestTemplate | null {
+  async getTemplate(templateId: string): Promise<DigestTemplate | null> {
     try {
       return this.predefinedTemplates.get(templateId) || null;
     } catch (error) {
@@ -308,30 +310,30 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    * Extract frequency from template ID
    * @param templateId The template ID
    */
-  private getFrequencyFromTemplateId(templateId: string): any {
+  private getFrequencyFromTemplateId(templateId: string): DigestFrequency {
     if (templateId.includes('daily')) {
-      return 'daily';
+      return DigestFrequency.DAILY;
     } else if (templateId.includes('weekly')) {
-      return 'weekly';
+      return DigestFrequency.WEEKLY;
     } else if (templateId.includes('bi-weekly')) {
-      return 'bi-weekly';
+      return DigestFrequency.BI_WEEKLY;
     } else if (templateId.includes('monthly')) {
-      return 'monthly';
+      return DigestFrequency.MONTHLY;
     }
-    return 'daily'; // Default
+    return DigestFrequency.DAILY; // Default
   }
 
   /**
    * Extract format from template ID
    * @param templateId The template ID
    */
-  private getFormatFromTemplateId(templateId: string): any {
+  private getFormatFromTemplateId(templateId: string): DigestFormat {
     if (templateId.includes('brief')) {
-      return 'brief';
+      return DigestFormat.BRIEF;
     } else if (templateId.includes('detailed')) {
-      return 'detailed';
+      return DigestFormat.DETAILED;
     }
-    return 'standard'; // Default
+    return DigestFormat.STANDARD; // Default
   }
 
   /**

@@ -76,8 +76,31 @@ export class FeedbackServiceImpl implements FeedbackService {
     newsletterId: string,
     feedbackType: FeedbackType | 'confirm' | 'reject',
     comment?: string
-  }): Promise<UserFeedback> {
+  }): Promise<UserFeedback>;
+  async submitFeedback(
+    userId: string, 
+    emailId: string, 
+    isNewsletter: boolean
+  ): Promise<void>;
+  async submitFeedback(
+    feedbackOrUserId: string | {
+      userId: string,
+      newsletterId: string,
+      feedbackType: FeedbackType | 'confirm' | 'reject',
+      comment?: string
+    },
+    emailId?: string,
+    isNewsletter?: boolean
+  ): Promise<UserFeedback | void> {
     try {
+      // Handle the overloaded method
+      if (typeof feedbackOrUserId === 'string') {
+        // This is the legacy method call pattern
+        return this.submitFeedbackLegacy(feedbackOrUserId, emailId!, isNewsletter!);
+      }
+      
+      // This is the new method call pattern with feedback object
+      const feedback = feedbackOrUserId;
       this.logger.info(`Submitting feedback for user ${feedback.userId}, newsletter ${feedback.newsletterId}: type=${feedback.feedbackType}`);
       
       // Handle string feedback types

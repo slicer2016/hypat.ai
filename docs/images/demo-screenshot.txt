@@ -1,0 +1,156 @@
+=====================================================================================
+                      HYPAT.AI DEMO: Newsletter Management System                      
+=====================================================================================
+
+
+SECTION 01: System Setup & Initialization
+---------------------------------------------------------------------
+
+STEP 01: Initialize Demo Environment
+
+⟳ Initializing demo environment...
+✓ Demo environment initialized successfully
+
+STEP 02: Generate Sample Data
+
+Sample Data Generated
+------------------
+Users: 2
+Newsletters: 30
+Categories: 14
+
+Sample Users
+-----------
+ID     | Name      | Email                 | 
+-------------------------------------------
+user-1 | Demo User | user1@example.com     | 
+user-2 | Test User | test.user@example.com | 
+
+Sample Categories
+---------------
+ID              | Name             | Description                              | 
+---------------------------------------------------------------------------------
+technology      | Technology       | Technology newsletters and content        | 
+finance         | Finance          | Finance newsletters and content           | 
+marketing       | Marketing        | Marketing newsletters and content         | 
+business        | Business         | Business newsletters and content          | 
+health          | Health           | Health newsletters and content            | 
+
+STEP 03: Initialize Core Services
+
+⟳ Initializing core services...
+✓ Core services initialized successfully
+
+
+SECTION 02: Newsletter Detection
+---------------------------------------------------------------------
+
+STEP 01: Detect Newsletters with Confidence Scores
+
+Newsletter Detection Results
+-------------------------
+ℹ Detection uses multiple signals to calculate confidence scores:
+ℹ - Sender reputation and history
+ℹ - Email header analysis
+ℹ - Content structure patterns
+ℹ - User feedback (when available)
+
+ID              | Subject                                   | Sender Domain       | Confidence | Status          | Verified | 
+----------------------------------------------------------------------------------------------------------------------
+newsletter-28   | Tech Today - Weekly Update #42            | substack.com        | 0.9876     | High Confidence | Yes      | 
+newsletter-15   | Marketing Masterclass - Latest Edition #38| beehiiv.com         | 0.9540     | High Confidence | Yes      | 
+newsletter-5    | Investment Insights - Special Report #12  | mailchimp.com       | 0.9123     | High Confidence | Yes      | 
+newsletter-22   | Business Brief - This Week's Insights #27 | convertkit.com      | 0.8654     | High Confidence | Yes      | 
+newsletter-11   | Science Spotlight - Trending Now #19      | medium.com          | 0.7821     | Medium Confidence| No       | 
+newsletter-3    | Health Headlines - Hot Topics #7          | morningbrew.com     | 0.6542     | Medium Confidence| No       | 
+newsletter-18   | Culture Club - Monthly Recap #4           | axios.com           | 0.5987     | Low Confidence  | No       | 
+newsletter-9    | Political Pulse - Breaking News #15       | forbes.com          | 0.5432     | Low Confidence  | No       | 
+
+STEP 02: Detection Metrics and Thresholds
+
+Detection Metrics and Thresholds
+----------------------------
+Average Confidence Score: 0.7856
+Minimum Confidence Score: 0.5102
+Maximum Confidence Score: 0.9876
+High Confidence Newsletters: 19 (63.3%)
+Medium Confidence Newsletters: 7 (23.3%)
+Low Confidence Newsletters: 4 (13.3%)
+
+
+SECTION 03: Content Processing & Extraction
+---------------------------------------------------------------------
+
+STEP 01: Content Extraction
+
+Content Extraction Example
+-----------------------
+Newsletter ID: newsletter-28
+Subject: Tech Today - Weekly Update #42
+Sender: tech.today@substack.com
+
+Extracted Content Snippet
+-----------------------
+Welcome to the latest edition of Tech Today. This week we're covering the most exciting developments in AI, cloud computing, and software engineering. 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...
+
+Content Structure
+--------------
+title: Tech Today - Weekly Update #42
+sections:
+  - id: section-1
+    title: Introduction
+    type: header
+    level: 1
+  - id: section-2
+    title: Main Content
+    type: content
+    level: 1
+  - id: section-3
+    title: Further Reading
+    type: list
+    level: 1
+metadata:
+  author: tech.today
+  publisher: substack.com
+  publicationDate: 2025-04-10T15:30:22.143Z
+  wordCount: 873
+
+
+SECTION 05: Digest Generation
+---------------------------------------------------------------------
+
+STEP 01: User Preferences for Digests
+
+Preferences for User: Demo User
+---------------------------
+Preference              | Value                                             | 
+-------------------------------------------------------------------------------
+Digest Frequency        | daily                                             | 
+Digest Format           | standard                                          | 
+Delivery Time           | 09:00                                             | 
+Timezone                | UTC                                               | 
+Preferred Categories    | Technology, Finance, Business                     | 
+
+STEP 02: Daily Digest Generation
+
+Daily Digest
+---------
+Digest ID: digest-a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6
+Title: Your Daily Newsletter Digest - Apr 23, 2025
+Generated At: 4/23/2025, 9:00:00 AM
+Period: 4/22/2025 to 4/23/2025
+Newsletter Count: 4
+
+Digest Sections
+------------
+
+Technology
+---------
+- Tech Today - Weekly Update #42 (tech.today) - 4/22/2025
+- AI Weekly - Latest Edition #15 (ai.weekly) - 4/22/2025
+
+Business
+-------
+- Business Brief - This Week's Insights #27 (business.brief) - 4/23/2025

@@ -1,0 +1,54 @@
+{
+  "environment": "demo",
+  "database": {
+    "type": "sqlite",
+    "filename": "./data/demo-database.sqlite",
+    "poolMin": 0,
+    "poolMax": 10,
+    "debug": false,
+    "migrate": true
+  },
+  "cache": {
+    "defaultTtl": 3600,
+    "maxSize": 1000
+  },
+  "email": {
+    "transport": "mock",
+    "from": "Hypat.ai Digests <digests@hypat.ai>",
+    "replyTo": "no-reply@hypat.ai"
+  },
+  "logging": {
+    "level": "info",
+    "file": {
+      "enabled": true,
+      "path": "./logs/demo.log",
+      "rotationInterval": "daily"
+    },
+    "console": {
+      "enabled": true,
+      "colorize": true
+    }
+  },
+  "mcp": {
+    "useMockGmailClient": true,
+    "port": 8080,
+    "host": "localhost"
+  },
+  "demo": {
+    "users": [
+      {
+        "id": "demo-user-1",
+        "email": "demo.user1@example.com",
+        "name": "Demo User 1"
+      },
+      {
+        "id": "demo-user-2",
+        "email": "demo.user2@example.com",
+        "name": "Demo User 2"
+      }
+    ],
+    "newsletterCount": 30,
+    "generateCategoriesForAllNewsletters": true,
+    "runFullWorkflow": true
+  }
+}

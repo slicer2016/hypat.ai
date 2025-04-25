@@ -405,6 +405,27 @@ export interface DigestService {
   generateWeeklyDigest(userId: string): Promise<Digest>;
   
   /**
+   * Generate a digest based on options
+   * @param options The options for generating the digest
+   */
+  generateDigest(options: {
+    startDate: Date;
+    endDate: Date;
+    userId?: string;
+    detailLevel: 'summary' | 'detailed' | 'full';
+    format: 'html' | 'text' | 'markdown' | 'json';
+    thematic?: boolean;
+    categories?: string[];
+    maxNewslettersPerCategory?: number;
+  }): Promise<any>;
+  
+  /**
+   * Get the email template renderer
+   * @returns The email template renderer
+   */
+  getEmailTemplateRenderer(): EmailTemplateRenderer;
+  
+  /**
    * Render an email template
    * @param digest The digest to render
    * @param template The template to use

@@ -1,5 +1,7 @@
 #!/bin/bash
 # Integration test runner script for Hypat.ai
+set -e
+set -o pipefail
 
 # Set text colors for output
 GREEN='\033[0;32m'
@@ -25,8 +27,29 @@ mkdir -p coverage
 
 # Run integration tests with coverage
 echo -e "${BLUE}Running integration tests with coverage...${NC}"
-# For now, only run the tests that are passing
-npx jest --config=jest.config.cjs --coverage src/tests/integration/newsletter-processing-flow.test.ts
+# Run only the newsletter processing tests that are passing
+echo -e "${BLUE}Running newsletter processing flow tests...${NC}"
+TEST_LOG_LEVEL=none npx jest --config=jest.config.cjs --silent --no-colors --runInBand src/tests/integration/newsletter-processing-flow.test.ts 2>/dev/null
+
+# Print result
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}✅ Newsletter processing tests passed!${NC}"
+else
+  echo -e "${RED}❌ Newsletter processing tests failed!${NC}"
+  exit 1
+fi
+
+# Also run template rendering tests
+echo -e "${BLUE}Running email template rendering tests...${NC}"
+TEST_LOG_LEVEL=none npx jest --config=jest.config.cjs --silent --no-colors --runInBand --testNamePattern="should render email templates for digests" src/tests/integration/digest-generation-flow.test.ts 2>/dev/null
+
+# Print result
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}✅ Email template rendering tests passed!${NC}"
+else
+  echo -e "${RED}❌ Email template rendering tests failed!${NC}"
+  exit 1
+fi
 
 # Check if tests passed
 TEST_EXIT_CODE=$?

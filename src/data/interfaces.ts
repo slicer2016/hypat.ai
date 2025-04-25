@@ -503,6 +503,26 @@ export interface CategoryRepository extends Repository<CategoryEntity> {
   findWithChildren(categoryId: string): Promise<CategoryEntity & { children: CategoryEntity[] } | null>;
 }
 
+/**
+ * Category assignment entity interface
+ */
+export interface CategoryAssignmentEntity extends Entity {
+  newsletterId: string;
+  categoryId: string;
+  confidence: number;
+  isManual: boolean;
+}
+
+/**
+ * Category assignment repository interface
+ */
+export interface CategoryAssignmentRepository extends Repository<CategoryAssignmentEntity> {
+  findByNewsletterAndCategory(newsletterId: string, categoryId: string): Promise<CategoryAssignmentEntity | null>;
+  findByNewsletter(newsletterId: string): Promise<CategoryAssignmentEntity[]>;
+  findByCategory(categoryId: string): Promise<CategoryAssignmentEntity[]>;
+  deleteForNewsletter(newsletterId: string): Promise<number>;
+}
+
 export interface FeedbackRepository extends Repository<FeedbackEntity> {
   findByUserAndNewsletter(userId: string, newsletterId: string): Promise<FeedbackEntity[]>;
   getStatistics(): Promise<Record<string, number>>;

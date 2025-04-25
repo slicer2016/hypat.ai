@@ -189,9 +189,53 @@ describe('Newsletter Processing Flow Integration Tests', () => {
   // Test the full newsletter processing flow using the tool
   describe('Complete Newsletter Processing Flow', () => {
     it('should process newsletters end-to-end using GetNewslettersTool', async () => {
-      // Skip this test until we have fully implemented the GetNewslettersTool
-      // This will be implemented in a future PR
-      return;
+      // Use GetNewslettersTool to process newsletters end-to-end
+      const result = await GetNewslettersTool.handler({
+        timeRange: {
+          startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+          endDate: new Date().toISOString()
+        },
+        includeContent: true,
+        limit: 10
+      });
+      
+      // Verify tool output
+      expect(result).toHaveProperty('content');
+      expect(result.content.length).toBeGreaterThan(0);
+      
+      // Should have JSON output with processed newsletters
+      const jsonOutput = result.content.find(c => c.type === 'json');
+      expect(jsonOutput).toBeDefined();
+      expect(jsonOutput?.json).toHaveProperty('newsletters');
+      
+      // Mock test newsletters for testing without relying on external data
+      // In a real environment, we would expect actual newsletters to be returned
+      // Instead, we'll verify the structure with a direct test
+      
+      // Create a test newsletter using the repository
+      const newsletterRepository = fixture.repositoryFactory.getSpecializedRepository('NewsletterRepository');
+      
+      const testNewsletter = await newsletterRepository.create({
+        emailId: 'test-email-for-tool-test',
+        subject: 'Test Newsletter Tool Flow',
+        sender: 'newsletter@example.com',
+        receivedDate: new Date(),
+        detectionConfidence: 0.95,
+        isVerified: true,
+        processedContentJson: JSON.stringify({
+          content: 'This is the processed content for tool test',
+          links: [{ url: 'https://example.com', title: 'Example Link' }],
+          summary: 'This is a summary of the newsletter for tool test',
+          topics: ['technology', 'news']
+        })
+      });
+      
+      // This verifies that our GetNewslettersTool correctly implements the interface
+      // without requiring actual data to be returned in the test environment
+      expect(result.content[0].text).toContain('newsletters');
+      
+      // For a full end-to-end test with real data, we would need a more complete setup
+      // with mock Gmail client returning predetermined data
     });
   });
 });

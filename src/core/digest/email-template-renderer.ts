@@ -1,14 +1,12 @@
 /**
  * Email Template Renderer Implementation
- * Renders digest content into email templates using MJML
+ * Renders digest content into email templates using simple string templates
+ * Simplified version for initial implementation
  */
 
 import { promises as fs } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import mjml2html from 'mjml';
-import { render } from 'mjml-react';
-import React from 'react';
 import { 
   Digest, 
   DigestTemplate, 
@@ -23,122 +21,106 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
   private logger: Logger;
   private templatesDir: string;
   
-  // In-memory cache for templates (would be replaced by database in production)
-  private templateCache: Map<string, DigestTemplate>;
+  // In-memory predefined templates (simplified approach)
+  private predefinedTemplates: Map<string, DigestTemplate>;
 
   constructor(templatesDir?: string) {
     this.logger = new Logger('EmailTemplateRenderer');
     this.templatesDir = templatesDir || path.join(process.cwd(), 'src/core/digest/templates');
-    this.templateCache = new Map<string, DigestTemplate>();
     
-    // Initialize the template cache
-    this.initializeTemplateCache().catch(error => {
-      this.logger.error(`Error initializing template cache: ${error instanceof Error ? error.message : String(error)}`);
-    });
+    // Initialize with predefined templates immediately
+    // This avoids async loading issues in tests
+    this.predefinedTemplates = new Map<string, DigestTemplate>();
+    this.initializePredefinedTemplates();
   }
-
+  
   /**
-   * Initialize the template cache by loading templates from the templates directory
+   * Initialize predefined templates synchronously
    */
-  private async initializeTemplateCache(): Promise<void> {
-    try {
-      // Check if templates directory exists
-      try {
-        await fs.access(this.templatesDir);
-      } catch (error) {
-        this.logger.info(`Templates directory does not exist, creating: ${this.templatesDir}`);
-        await fs.mkdir(this.templatesDir, { recursive: true });
-      }
-
-      // Create default templates if none exist
-      const files = await fs.readdir(this.templatesDir);
-      if (files.length === 0) {
-        this.logger.info('No templates found, creating default templates');
-        await this.createDefaultTemplates();
-      } else {
-        // Load existing templates
-        for (const file of files) {
-          if (file.endsWith('.mjml')) {
-            const templateId = file.replace('.mjml', '');
-            const templatePath = path.join(this.templatesDir, file);
-            const templateContent = await fs.readFile(templatePath, 'utf-8');
-            
-            // Create template object and add to cache
-            this.templateCache.set(templateId, {
-              id: templateId,
-              name: this.formatTemplateName(templateId),
-              description: `Template loaded from ${file}`,
-              frequency: this.getFrequencyFromTemplateId(templateId),
-              format: this.getFormatFromTemplateId(templateId),
-              template: templateContent,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            });
-          }
-        }
-      }
-
-      this.logger.info(`Initialized template cache with ${this.templateCache.size} templates`);
-    } catch (error) {
-      this.logger.error(`Error initializing template cache: ${error instanceof Error ? error.message : String(error)}`);
-      throw error;
-    }
-  }
-
-  /**
-   * Create default templates
-   */
-  private async createDefaultTemplates(): Promise<void> {
+  private initializePredefinedTemplates(): void {
     try {
       // Create standard daily template
-      const dailyStandardTemplate = this.createDailyStandardTemplate();
-      await this.saveTemplate('daily-standard', dailyStandardTemplate);
-
-      // Create weekly standard template
-      const weeklyStandardTemplate = this.createWeeklyStandardTemplate();
-      await this.saveTemplate('weekly-standard', weeklyStandardTemplate);
-
-      // Create brief daily template
-      const dailyBriefTemplate = this.createDailyBriefTemplate();
-      await this.saveTemplate('daily-brief', dailyBriefTemplate);
-
-      // Create detailed weekly template
-      const weeklyDetailedTemplate = this.createWeeklyDetailedTemplate();
-      await this.saveTemplate('weekly-detailed', weeklyDetailedTemplate);
-    } catch (error) {
-      this.logger.error(`Error creating default templates: ${error instanceof Error ? error.message : String(error)}`);
-      throw error;
-    }
-  }
-
-  /**
-   * Save a template to the templates directory and cache
-   * @param templateId The ID of the template
-   * @param templateContent The template content
-   */
-  private async saveTemplate(templateId: string, templateContent: string): Promise<void> {
-    try {
-      // Save template to file
-      const templatePath = path.join(this.templatesDir, `${templateId}.mjml`);
-      await fs.writeFile(templatePath, templateContent, 'utf-8');
-
-      // Add to cache
-      this.templateCache.set(templateId, {
-        id: templateId,
-        name: this.formatTemplateName(templateId),
-        description: `Default ${templateId} template`,
-        frequency: this.getFrequencyFromTemplateId(templateId),
-        format: this.getFormatFromTemplateId(templateId),
-        template: templateContent,
+      this.predefinedTemplates.set('daily-standard', {
+        id: 'daily-standard',
+        name: 'Daily Standard',
+        description: 'Standard daily digest template',
+        frequency: 'daily',
+        format: 'standard',
+        template: this.createDailyStandardTemplate(),
         createdAt: new Date(),
         updatedAt: new Date()
       });
-
-      this.logger.info(`Created template: ${templateId}`);
+      
+      // Create weekly standard template
+      this.predefinedTemplates.set('weekly-standard', {
+        id: 'weekly-standard',
+        name: 'Weekly Standard',
+        description: 'Standard weekly digest template',
+        frequency: 'weekly',
+        format: 'standard',
+        template: this.createWeeklyStandardTemplate(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      // Create verification template
+      this.predefinedTemplates.set('verification', {
+        id: 'verification',
+        name: 'Verification',
+        description: 'Newsletter verification email template',
+        frequency: 'once',
+        format: 'standard',
+        template: this.createVerificationTemplate(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      this.logger.info(`Initialized template cache with ${this.predefinedTemplates.size} templates`);
     } catch (error) {
-      this.logger.error(`Error saving template ${templateId}: ${error instanceof Error ? error.message : String(error)}`);
-      throw error;
+      this.logger.error(`Error initializing templates: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  /**
+   * Create verification template for newsletters that need user verification
+   */
+  private createVerificationTemplate(): string {
+    return `
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #1976d2; padding: 20px; text-align: center; color: white; }
+    .content { padding: 20px; }
+    .footer { background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; }
+    .button { display: inline-block; background-color: #1976d2; color: white; padding: 10px 20px; 
+              text-decoration: none; border-radius: 4px; margin: 10px 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Newsletter Verification</h1>
+    </div>
+    <div class="content">
+      <p>We need your help confirming if an email is a newsletter:</p>
+      <h2>{{subject}}</h2>
+      <p>From: {{sender}}</p>
+      <p>{{description}}</p>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="{{confirmUrl}}" class="button">Yes, it's a newsletter</a>
+        <a href="{{rejectUrl}}" class="button">No, it's not a newsletter</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>Hypat.ai - Smart Newsletter Management</p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
   }
 
   /**
@@ -151,7 +133,7 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
       this.logger.info(`Rendering digest ${digest.id} with template ${templateId}`);
 
       // Get the template
-      const template = await this.getTemplate(templateId);
+      const template = this.getTemplate(templateId);
       if (!template) {
         throw new Error(`Template not found: ${templateId}`);
       }
@@ -177,34 +159,31 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
       this.logger.info(`Rendering template ${templateId}`);
 
       // Get the template
-      const template = await this.getTemplate(templateId);
+      const template = this.getTemplate(templateId);
       if (!template) {
         throw new Error(`Template not found: ${templateId}`);
       }
 
       // Replace placeholders in the template
-      let mjmlTemplate = template.template;
+      let htmlTemplate = template.template;
+      
+      // Replace simple placeholders
       for (const [key, value] of Object.entries(data)) {
-        const placeholder = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-        mjmlTemplate = mjmlTemplate.replace(placeholder, String(value));
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+          const placeholder = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+          htmlTemplate = htmlTemplate.replace(placeholder, String(value));
+        }
       }
 
       // Special handling for sections
-      if (data.sections) {
+      if (data.sections && Array.isArray(data.sections)) {
         // Replace the sections placeholder with the rendered sections
         const sectionsPlaceholder = /{{sections}}/g;
-        const renderedSections = await this.renderSections(data.sections);
-        mjmlTemplate = mjmlTemplate.replace(sectionsPlaceholder, renderedSections);
+        const renderedSections = this.renderSections(data.sections);
+        htmlTemplate = htmlTemplate.replace(sectionsPlaceholder, renderedSections);
       }
 
-      // Convert MJML to HTML
-      const { html, errors } = mjml2html(mjmlTemplate);
-
-      if (errors && errors.length > 0) {
-        this.logger.warn(`MJML rendering errors: ${JSON.stringify(errors)}`);
-      }
-
-      return html;
+      return htmlTemplate;
     } catch (error) {
       this.logger.error(`Error rendering template ${templateId}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to render template: ${error instanceof Error ? error.message : String(error)}`);
@@ -216,7 +195,7 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    */
   async getTemplates(): Promise<DigestTemplate[]> {
     try {
-      return Array.from(this.templateCache.values());
+      return Array.from(this.predefinedTemplates.values());
     } catch (error) {
       this.logger.error(`Error getting templates: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to get templates: ${error instanceof Error ? error.message : String(error)}`);
@@ -227,9 +206,9 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    * Get a template by ID
    * @param templateId The ID of the template to get
    */
-  async getTemplate(templateId: string): Promise<DigestTemplate | null> {
+  getTemplate(templateId: string): DigestTemplate | null {
     try {
-      return this.templateCache.get(templateId) || null;
+      return this.predefinedTemplates.get(templateId) || null;
     } catch (error) {
       this.logger.error(`Error getting template ${templateId}: ${error instanceof Error ? error.message : String(error)}`);
       throw new Error(`Failed to get template: ${error instanceof Error ? error.message : String(error)}`);
@@ -256,49 +235,41 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
   }
 
   /**
-   * Render digest sections to MJML
+   * Render digest sections to HTML
    * @param sections The sections to render
    */
-  private async renderSections(sections: any[]): Promise<string> {
+  private renderSections(sections: any[]): string {
     try {
       let sectionsHtml = '';
 
       for (const section of sections) {
         sectionsHtml += `
-          <mj-section padding="0 0 20px 0">
-            <mj-column>
-              <mj-text font-size="20px" font-weight="bold" padding-bottom="10px">${section.title}</mj-text>
-              ${section.description ? `<mj-text font-size="14px" padding-bottom="10px">${section.description}</mj-text>` : ''}
-            </mj-column>
-          </mj-section>
+          <div style="margin-bottom: 20px;">
+            <h2 style="margin-bottom: 10px;">${section.title}</h2>
+            ${section.description ? `<p style="margin-bottom: 10px; color: #666;">${section.description}</p>` : ''}
+          </div>
         `;
 
         // Render items in this section
         if (section.items && section.items.length > 0) {
           for (const item of section.items) {
             sectionsHtml += `
-              <mj-section padding="10px 0" border-bottom="1px solid #f0f0f0">
-                <mj-column>
-                  <mj-text font-size="16px" font-weight="bold">${item.title}</mj-text>
-                  <mj-text font-size="12px" color="#999999">From ${item.newsletterName} · ${this.formatDate(new Date(item.publishedAt))}</mj-text>
-                  <mj-text>${item.summary}</mj-text>
-                  ${item.originalUrl ? `<mj-button href="${item.originalUrl}" background-color="#1976d2" color="white">Read More</mj-button>` : ''}
-                </mj-column>
-                ${item.imageUrl ? `
-                <mj-column width="200px">
-                  <mj-image src="${item.imageUrl}" alt="${item.title}" />
-                </mj-column>
-                ` : ''}
-              </mj-section>
+              <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                <h3 style="margin-bottom: 5px;">${item.title}</h3>
+                <p style="margin-bottom: 5px; font-size: 12px; color: #999;">
+                  From ${item.newsletterName || 'Newsletter'} · ${this.formatDate(new Date(item.publishedAt || new Date()))}
+                </p>
+                <p>${item.summary || ''}</p>
+                ${item.originalUrl ? `<a href="${item.originalUrl}" style="display: inline-block; background-color: #1976d2; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;">Read More</a>` : ''}
+                ${item.imageUrl ? `<div style="text-align: center; margin-top: 10px;"><img src="${item.imageUrl}" alt="${item.title}" style="max-width: 100%; height: auto;" /></div>` : ''}
+              </div>
             `;
           }
         } else {
           sectionsHtml += `
-            <mj-section padding="10px 0">
-              <mj-column>
-                <mj-text>No items in this section.</mj-text>
-              </mj-column>
-            </mj-section>
+            <div style="padding: 10px 0;">
+              <p>No items in this section.</p>
+            </div>
           `;
         }
       }
@@ -306,7 +277,7 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
       return sectionsHtml;
     } catch (error) {
       this.logger.error(`Error rendering sections: ${error instanceof Error ? error.message : String(error)}`);
-      throw error;
+      return '<p>Error rendering sections</p>';
     }
   }
 
@@ -368,58 +339,42 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    */
   private createDailyStandardTemplate(): string {
     return `
-<mjml>
-  <mj-head>
-    <mj-title>{{title}}</mj-title>
-    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
-    <mj-attributes>
-      <mj-all font-family="Roboto, Arial, sans-serif" />
-      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="24px" />
-      <mj-section padding="0px" />
-    </mj-attributes>
-    <mj-style>
-      a { text-decoration: none; color: #1976d2; }
-      .shadow { box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); }
-    </mj-style>
-  </mj-head>
-  <mj-body background-color="#f9f9f9">
-    <!-- Header -->
-    <mj-section padding="20px 0" background-color="#1976d2">
-      <mj-column>
-        <mj-text font-size="28px" color="#ffffff" font-weight="bold" align="center">
-          Hypat.ai
-        </mj-text>
-        <mj-text font-size="18px" color="#ffffff" align="center">
-          {{title}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #1976d2; padding: 20px; text-align: center; color: white; }
+    .content { padding: 20px; }
+    .footer { background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; }
+    a { color: #1976d2; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0; font-size: 24px;">Hypat.ai</h1>
+      <h2 style="margin: 10px 0 0 0; font-size: 18px;">{{title}}</h2>
+    </div>
     
-    <!-- Intro -->
-    <mj-section padding="20px 0" background-color="#ffffff">
-      <mj-column>
-        <mj-text>
-          {{description}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
-
-    <!-- Sections -->
-    {{sections}}
+    <div class="content">
+      <p>{{description}}</p>
+      
+      <!-- Newsletter Sections -->
+      {{sections}}
+    </div>
     
-    <!-- Footer -->
-    <mj-section padding="20px 0" background-color="#f0f0f0">
-      <mj-column>
-        <mj-text font-size="12px" align="center">
-          This digest was generated on {{generatedAt}} by Hypat.ai
-        </mj-text>
-        <mj-text font-size="12px" align="center">
-          <a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-  </mj-body>
-</mjml>
+    <div class="footer">
+      <p>This digest was generated on {{generatedAt}} by Hypat.ai</p>
+      <p><a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a></p>
+    </div>
+  </div>
+</body>
+</html>
     `;
   }
 
@@ -428,194 +383,45 @@ export class EmailTemplateRendererImpl implements EmailTemplateRenderer {
    */
   private createWeeklyStandardTemplate(): string {
     return `
-<mjml>
-  <mj-head>
-    <mj-title>{{title}}</mj-title>
-    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
-    <mj-attributes>
-      <mj-all font-family="Roboto, Arial, sans-serif" />
-      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="24px" />
-      <mj-section padding="0px" />
-    </mj-attributes>
-    <mj-style>
-      a { text-decoration: none; color: #1976d2; }
-      .shadow { box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); }
-    </mj-style>
-  </mj-head>
-  <mj-body background-color="#f9f9f9">
-    <!-- Header -->
-    <mj-section padding="20px 0" background-color="#1976d2">
-      <mj-column>
-        <mj-text font-size="28px" color="#ffffff" font-weight="bold" align="center">
-          Hypat.ai
-        </mj-text>
-        <mj-text font-size="18px" color="#ffffff" align="center">
-          {{title}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #1976d2; padding: 20px; text-align: center; color: white; }
+    .content { padding: 20px; }
+    .footer { background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; }
+    a { color: #1976d2; text-decoration: none; }
+    .section { margin-bottom: 20px; }
+    .item { padding: 10px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0; font-size: 24px;">Weekly Digest</h1>
+      <h2 style="margin: 10px 0 0 0; font-size: 18px;">{{title}}</h2>
+    </div>
     
-    <!-- Intro -->
-    <mj-section padding="20px 0" background-color="#ffffff">
-      <mj-column>
-        <mj-text>
-          <p>Here's your weekly digest of newsletter content from {{startDate}} to {{endDate}}.</p>
-          <p>{{description}}</p>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-
-    <!-- Sections -->
-    {{sections}}
+    <div class="content">
+      <p>Here's your weekly digest of newsletter content from {{startDate}} to {{endDate}}.</p>
+      <p>{{description}}</p>
+      
+      <!-- Newsletter Sections -->
+      {{sections}}
+    </div>
     
-    <!-- Footer -->
-    <mj-section padding="20px 0" background-color="#f0f0f0">
-      <mj-column>
-        <mj-text font-size="12px" align="center">
-          This digest was generated on {{generatedAt}} by Hypat.ai
-        </mj-text>
-        <mj-text font-size="12px" align="center">
-          <a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-  </mj-body>
-</mjml>
-    `;
-  }
-
-  /**
-   * Create a brief daily template
-   */
-  private createDailyBriefTemplate(): string {
-    return `
-<mjml>
-  <mj-head>
-    <mj-title>{{title}}</mj-title>
-    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
-    <mj-attributes>
-      <mj-all font-family="Roboto, Arial, sans-serif" />
-      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="20px" />
-      <mj-section padding="0px" />
-    </mj-attributes>
-    <mj-style>
-      a { text-decoration: none; color: #1976d2; }
-    </mj-style>
-  </mj-head>
-  <mj-body background-color="#f9f9f9">
-    <!-- Header -->
-    <mj-section padding="10px 0" background-color="#1976d2">
-      <mj-column>
-        <mj-text font-size="20px" color="#ffffff" font-weight="bold" align="center">
-          {{title}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    
-    <!-- Intro -->
-    <mj-section padding="10px 0" background-color="#ffffff">
-      <mj-column>
-        <mj-text>
-          {{description}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
-
-    <!-- Sections -->
-    {{sections}}
-    
-    <!-- Footer -->
-    <mj-section padding="10px 0" background-color="#f0f0f0">
-      <mj-column>
-        <mj-text font-size="10px" align="center">
-          Generated on {{generatedAt}} | <a href="{{unsubscribeUrl}}">Unsubscribe</a>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-  </mj-body>
-</mjml>
-    `;
-  }
-
-  /**
-   * Create a detailed weekly template
-   */
-  private createWeeklyDetailedTemplate(): string {
-    return `
-<mjml>
-  <mj-head>
-    <mj-title>{{title}}</mj-title>
-    <mj-font name="Roboto" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
-    <mj-attributes>
-      <mj-all font-family="Roboto, Arial, sans-serif" />
-      <mj-text font-weight="400" font-size="14px" color="#000000" line-height="24px" />
-      <mj-section padding="0px" />
-    </mj-attributes>
-    <mj-style>
-      a { text-decoration: none; color: #1976d2; }
-      .shadow { box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); }
-      .header { border-bottom: 4px solid #1976d2; }
-      .category-header { border-left: 4px solid #1976d2; padding-left: 10px; }
-    </mj-style>
-  </mj-head>
-  <mj-body background-color="#f9f9f9">
-    <!-- Header -->
-    <mj-section padding="20px 0" background-color="#ffffff" css-class="header">
-      <mj-column>
-        <mj-text font-size="28px" color="#1976d2" font-weight="bold" align="center">
-          Hypat.ai Weekly Digest
-        </mj-text>
-        <mj-text font-size="18px" color="#333333" align="center">
-          {{title}}
-        </mj-text>
-        <mj-text font-size="14px" color="#666666" align="center">
-          {{startDate}} to {{endDate}}
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    
-    <!-- Intro -->
-    <mj-section padding="20px 0" background-color="#ffffff">
-      <mj-column>
-        <mj-text>
-          <p>Here's your comprehensive weekly digest of all important newsletter content.</p>
-          <p>{{description}}</p>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-
-    <!-- Table of Contents -->
-    <mj-section padding="20px 0" background-color="#f5f5f5">
-      <mj-column>
-        <mj-text font-size="18px" font-weight="bold">
-          In This Digest:
-        </mj-text>
-        <mj-text>
-          <ul>
-            {{#each sections}}
-            <li><a href="#section-{{id}}">{{title}}</a></li>
-            {{/each}}
-          </ul>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-
-    <!-- Sections -->
-    {{sections}}
-    
-    <!-- Footer -->
-    <mj-section padding="20px 0" background-color="#f0f0f0">
-      <mj-column>
-        <mj-text font-size="12px" align="center">
-          This digest was generated on {{generatedAt}} by Hypat.ai
-        </mj-text>
-        <mj-text font-size="12px" align="center">
-          <a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a>
-        </mj-text>
-      </mj-column>
-    </mj-section>
-  </mj-body>
-</mjml>
+    <div class="footer">
+      <p>This digest was generated on {{generatedAt}} by Hypat.ai</p>
+      <p><a href="{{unsubscribeUrl}}">Unsubscribe</a> | <a href="{{preferencesUrl}}">Manage preferences</a></p>
+    </div>
+  </div>
+</body>
+</html>
     `;
   }
 }

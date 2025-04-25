@@ -12,7 +12,7 @@ import {
   DigestItemEntity, 
   NewsletterEntity 
 } from '../interfaces.js';
-import { BaseRepository } from '../repository-factory.js';
+import { BaseRepository } from './base-repository.js';
 import { CacheManager } from '../interfaces.js';
 import { Logger } from '../../utils/logger.js';
 

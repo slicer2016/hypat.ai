@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="7" failures="0" errors="0" time="0.523">
+  <testsuite name="Newsletter Processing Flow Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-04-25T01:34:20" time="0.51" tests="7">
+    <testcase classname="Newsletter Processing Flow Integration Tests Newsletter Detection should correctly identify newsletter emails" name="Newsletter Processing Flow Integration Tests Newsletter Detection should correctly identify newsletter emails" time="0.004">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Newsletter Detection should correctly identify non-newsletter emails" name="Newsletter Processing Flow Integration Tests Newsletter Detection should correctly identify non-newsletter emails" time="0">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Newsletter Detection should use the DetectNewsletterTool correctly" name="Newsletter Processing Flow Integration Tests Newsletter Detection should use the DetectNewsletterTool correctly" time="0.001">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Newsletter Content Processing should extract and process newsletter content" name="Newsletter Processing Flow Integration Tests Newsletter Content Processing should extract and process newsletter content" time="0">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Newsletter Content Processing should use the ExtractNewsletterContentTool correctly" name="Newsletter Processing Flow Integration Tests Newsletter Content Processing should use the ExtractNewsletterContentTool correctly" time="0.003">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Storing Processed Newsletters should store processed newsletters in the database" name="Newsletter Processing Flow Integration Tests Storing Processed Newsletters should store processed newsletters in the database" time="0">
+    </testcase>
+    <testcase classname="Newsletter Processing Flow Integration Tests Complete Newsletter Processing Flow should process newsletters end-to-end using GetNewslettersTool" name="Newsletter Processing Flow Integration Tests Complete Newsletter Processing Flow should process newsletters end-to-end using GetNewslettersTool" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

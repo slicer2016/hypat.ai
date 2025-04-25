@@ -126,6 +126,7 @@ export interface FeedbackAnalytics {
     rejected: string[];      // Patterns found in rejected newsletters
     uncertain?: string[];    // Patterns found in uncertain emails
   };
+  senderTrustScores?: Record<string, number>; // Trust scores for senders
   recommendations?: string[]; // Improvement recommendations
   generatedAt: Date;
 }

@@ -143,4 +143,36 @@ export class CategorizerImpl implements Categorizer {
       throw new Error(`Failed to link newsletter to category: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  
+  /**
+   * Get the theme detector instance
+   * @returns The theme detector instance
+   */
+  getThemeDetector(): ThemeDetector {
+    return this.themeDetector;
+  }
+  
+  /**
+   * Get the manual categorization handler
+   * @returns The manual categorization handler
+   */
+  getManualCategorizationHandler(): ManualCategorizationHandler {
+    return this.manualHandler;
+  }
+  
+  /**
+   * Get the category manager
+   * @returns The category manager
+   */
+  getCategoryManager(): CategoryManager {
+    return this.categoryManager;
+  }
+  
+  /**
+   * Get the category matcher
+   * @returns The category matcher
+   */
+  getCategoryMatcher(): CategoryMatcher {
+    return this.categoryMatcher;
+  }
 }

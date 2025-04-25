@@ -89,3 +89,28 @@ export const defaultSqliteConfig: DatabaseConfig = {
   debug: false,
   migrate: true
 };
+
+/**
+ * Global repository factory for convenience
+ * This is primarily used by tools and services that need quick access to repositories
+ */
+let globalRepositoryFactory: RepositoryFactory | null = null;
+
+/**
+ * Get the global repository factory
+ * This should be initialized during application startup
+ */
+export function getRepositoryFactory(): RepositoryFactory {
+  if (!globalRepositoryFactory) {
+    throw new Error('Repository factory not initialized. Call initializeRepositoryFactory first.');
+  }
+  return globalRepositoryFactory;
+}
+
+/**
+ * Initialize the global repository factory
+ * @param factory The repository factory to use globally
+ */
+export function initializeRepositoryFactory(factory: RepositoryFactory): void {
+  globalRepositoryFactory = factory;
+}

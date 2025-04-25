@@ -100,6 +100,10 @@ export class FeedbackAnalyzerImpl implements FeedbackAnalyzer {
         .slice(0, 5)
         .map(item => item.domain);
       
+      // Generate patterns and recommendations
+      const patternResults = await this.identifyPatterns(userId);
+      const recommendations = await this.generateSuggestions(userId);
+
       // Create the analytics object
       const analytics: FeedbackAnalytics = {
         userId,
@@ -115,6 +119,18 @@ export class FeedbackAnalyzerImpl implements FeedbackAnalyzer {
         falseNegatives,
         domainBreakdown,
         topMisclassifiedDomains: misclassifiedDomains,
+        patterns: {
+          confirmed: feedback
+            .filter(item => item.type === FeedbackType.CONFIRM)
+            .map(item => item.sender),
+          rejected: feedback
+            .filter(item => item.type === FeedbackType.REJECT)
+            .map(item => item.sender)
+        },
+        senderTrustScores: Object.fromEntries(
+          Array.from(patternResults.frequentFeedbackSenders).map(sender => [sender, 0.8])
+        ),
+        recommendations,
         generatedAt: new Date()
       };
       

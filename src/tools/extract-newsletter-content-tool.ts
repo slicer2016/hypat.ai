@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { Tool } from '../interfaces/mcp-server.js';
-import { ContentProcessorImpl } from '../core/content-processing/content-processor-impl.js';
+import { createContentProcessor } from '../core/content-processing/index.js';
 import { Logger } from '../utils/logger.js';
 
 // Input schema for the tool
@@ -59,7 +59,7 @@ export const ExtractNewsletterContentTool: Tool = {
   
   handler: async (params: ExtractNewsletterContentInputType): Promise<ExtractNewsletterContentOutputType> => {
     const logger = new Logger('ExtractNewsletterContentTool');
-    const contentProcessor = new ContentProcessorImpl();
+    const contentProcessor = createContentProcessor();
     
     try {
       logger.info(`Executing ExtractNewsletterContentTool for email: ${params.emailId}`);

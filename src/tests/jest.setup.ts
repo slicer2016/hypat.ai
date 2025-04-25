@@ -4,6 +4,18 @@
 
 import { DateTime } from 'luxon';
 
+// Reduce console noise in tests
+const originalConsoleLog = console.log;
+const originalConsoleInfo = console.info;
+const originalConsoleDebug = console.debug;
+
+if (process.env.TEST_LOG_LEVEL === 'none') {
+  console.log = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+  console.warn = () => {};
+}
+
 // Mock the uuid.v4 function to return deterministic IDs for tests
 jest.mock('uuid', () => {
   let counter = 1;
@@ -28,5 +40,27 @@ global.Date = class extends originalDate {
 
 // Also override Date.now
 global.Date.now = () => mockDate.getTime();
+
+// Set up a global afterAll to ensure we clean up any remaining connections or resources
+afterAll(async () => {
+  if (global.testDatabaseManager) {
+    try {
+      await global.testDatabaseManager.closeAll();
+    } catch (e) {
+      // Ignore errors during cleanup
+    }
+    global.testDatabaseManager = null;
+  }
+  
+  global.testRepositoryFactory = null;
+  
+  // Allow time for any pending operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+});
+
+// Globals for test fixtures
+global.testDatabaseManager = null;
+global.testRepositoryFactory = null;
+global.testEnvironment = true;
 
 console.log('Jest setup complete - UUID and Date mocks configured');

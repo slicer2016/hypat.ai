@@ -44,14 +44,37 @@ export class EmailSenderImpl implements EmailSender {
     deliveryTracker?: DeliveryTracker
   ) {
     this.logger = new Logger('EmailSender');
-    this.transporter = nodemailer.createTransport(transportOptions);
     this.defaultFrom = defaultFrom;
     this.deliveryTracker = deliveryTracker;
     
-    // Verify the transporter configuration
-    this.verifyTransporter().catch(error => {
-      this.logger.error(`Transporter verification failed: ${error instanceof Error ? error.message : String(error)}`);
-    });
+    // Check if running in test environment
+    if (global.testEnvironment === true) {
+      // Use a mock transporter for tests
+      this.logger.info('Using mock email transporter for tests');
+      this.transporter = {
+        sendMail: async (mailOptions: any) => {
+          this.logger.info(`[TEST] Mock sending email to: ${mailOptions.to}`);
+          return {
+            messageId: `mock-message-${uuidv4()}`,
+            response: 'Mock response',
+            accepted: [mailOptions.to],
+            rejected: [],
+            pending: [],
+            envelope: { from: mailOptions.from, to: [mailOptions.to] }
+          };
+        },
+        verify: async () => true,
+        close: async () => true
+      } as unknown as nodemailer.Transporter;
+    } else {
+      // Use real nodemailer transporter for production
+      this.transporter = nodemailer.createTransport(transportOptions);
+      
+      // Verify the transporter configuration
+      this.verifyTransporter().catch(error => {
+        this.logger.error(`Transporter verification failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    }
   }
 
   /**

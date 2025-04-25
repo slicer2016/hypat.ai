@@ -88,12 +88,11 @@ export function createFeedbackService(
     detectionImprover
   );
   
-  return {
-    feedbackCollector,
-    verificationGenerator,
-    feedbackAnalyzer,
-    detectionImprover,
-    repository,
-    feedbackService
-  };
+  // Enhanced the feedbackService with direct access to components for tests
+  feedbackService.getVerificationRequestGenerator = () => verificationGenerator;
+  feedbackService.getFeedbackAnalyzer = () => feedbackAnalyzer;
+  feedbackService.getDetectionImprover = () => detectionImprover;
+  feedbackService.getFeedbackCollector = () => feedbackCollector;
+  
+  return feedbackService;
 }
